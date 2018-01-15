@@ -1,63 +1,169 @@
-var questions[{
-  "question": "What is the capital of Maryland"
-  "option1": "Frederick"
-  "option2": "Bethesda"
-  "option3": "Annapolis"
-  "option4": "Baltimore"
-  "answer": "3"
-}, {
-  "question": "What is the capital of North Carolina"
-  "option1": "Durham"
-  "option2": "Raleigh"
-  "option3": "Charolette"
-  "option4": "New Bern"
-  "answer": "2"
-}, {  
-  "question": "What is the capital of New York"
-  "option1": "Albany"
-  "option2": "New York"
-  "option3": "Nyack"
-  "option4": "White Plains"
-  "answer": "1"
-}, {
-  "question": "What is the capital of California"
-  "option1": "San Francisco"
-  "option2": "San Jose"
-  "option3": "Los Angeles"
-  "option4": "Pasedena"
-  "answer": "4"
-}
-]
+$( document ).ready(function() {
 
-var currentQuestion = 0;
-var score = 0;
+  var game = {
+    questions: [
+    {
+        question: 'What is the capital of Maryland?',
+        possibles: ['Frederick', 'Annapolis', 'Rockville', 'Baltimore'],
+        id: 'question-one',
+        answer: 1
+    }, {
+      question: 'What is the capital of New York',
+      possibles: ['New York', 'Albany', 'White Plains', 'Nyack'],
+      id: 'question-two',
+      answer: 1
+    }, {
+      question: 'What is the capital of South Carolina?',
+      possibles: ['Charleston', 'Greenville', 'Columbia', 'Myrtle Beach'],
+      id: 'question-three',
+      answer: 2
+    }, {
+      question: 'What is the capital of Georgia?',
+      possibles: ['Savannah', 'Augusta', 'Decatur', 'Atlanta'],
+      id: 'question-four',
+      answer: 3
+    }, {
+      question: 'What is the capital of Virginia?',
+      possibles: ['Richmond', 'Fredericksburg', 'Roanoke', 'Arlington'],
+      id: 'question-five',
+      answer: 0
+    }, {
+      question: 'What is the capital of Colorado?',
+      possibles: ['Boulder', 'Denver', 'Vail', 'Fort Collins', 'Grand Junction'],
+      id: 'question-six',
+      answer: 1
 
-var container = document.getElementbyId('quizContainer');
-var Question = document.getElementbyId('question');
-var opt1 = document.getElementbyId('opt1');
-var opt2 = document.getElementbyId('opt2');
-var opt3 = document.getElementbyId('opt3');
-var opt4 = document.getElementbyId('opt4');
+    }, {
+      question: 'What is the capital of Arizone?',
+      possibles: ['Mesa', 'Sun City', 'Phoenix', 'Tuscon'],
+      id: 'question-seven',
+      answer: 2
+    }, {
+      question: 'What is the capital of Connecticut?',
+      possibles: ['Middletown', 'New Haven', 'Durham', 'Hartford'],
+      id: 'question-eight',
+      answer: 3
+    }
+    ]}
 
-function askQuestion (questionIndex) {
-  var q = questions[questionIndex];
-  questions.textContent = (questionIndex + 1) + '. ' +q.question;
-  opt1.textContent = q.option1;
-  opt2.textContent = q.option2;
-  opt3.textContent = q.option3;
-  opt4.textContent = q.option4;
-};
+  var message = 'Game Over!';
 
-var counter = '0'
-function setup(){
-  noCanvas();
-  var timer = select('#timer');
-  timer.html(counter);
+    $(".startGame").on("click", function (){
 
-  function timeIt(){
-    counter++;
+    $('.wrapper').show();
+    console.log('hello');
+
+    $(this).hide();
+  });
+
+    var number = 30;
+    $('#timeLeft').on('click', run);
+
+    function decrement(){
+        
+        number--;
+       
+        $('#timeLeft').html('<h2>' + number + " seconds"+'</h2>');
+        
+        if (number === 0){
+        
+        stop();
+
+        $('#message').html('time up!');
+        checkAnswers();
+        }
+    }
+
+    function run(){
+        counter = setInterval(decrement, 1000);
+    }
+    
+    function stop(){
+    
+        clearInterval(counter);
+    }
+
+    run();
+
+function formTemplate(data) {
+
+  var qString = "<form id='questionOne'>"+ data.question +"<br>";
+
+  var possibles = data.possibles;
+
+  for (var i = 0; i < possibles.length; i++) {
+    var possible = possibles[i];
+    console.log(possible);
+    qString = qString + "<input type='radio' name='"+data.id+"' value="+ i +">"+possible;
 
   }
-  setInterval (timeIt, 1000);
+  return qString + "</form>";
+}
+window.formTemplate = formTemplate;
+
+function buildQuestions(){
+  var questionHTML = ''
+  for (var i = 0; i<game.questions.length; i++) {
+    questionHTML = questionHTML + formTemplate(game.questions[i]);
+  }
+  $('#questions-container').append(questionHTML);
+
 }
 
+function isCorrect(question){
+  var answers = $('[name='+question.id+']');
+  var correct = answers.eq(question.answer);
+  var isChecked = correct.is(':checked');
+  return isChecked;
+}
+
+buildQuestions();
+
+function resultsTemplate(question){
+  var htmlBlock = '<div>'
+  htmlBlock = htmlBlock + question.question + ': ' + isChecked;
+  return htmlBlock + "</div>";
+}
+
+function checkAnswers (){
+
+  var resultsHTML = '';
+  var guessedAnswers = [];
+  var correct = 0;
+  var incorrect = 0;
+  var unAnswered =0
+
+  for (var i = 0; i<game.questions.length; i++) {
+    if (isCorrect(game.questions[i])) {
+      correct++;
+    } else {
+
+      if (checkAnswered(game.questions[i])) {
+        incorrect++;
+      } else {
+        unAnswered++;
+      }
+    }
+  }
+
+  $('.results').html('correct: '+correct+ "<br>" +'incorrect: '+incorrect+ "<br>" +'unanswered: '+unAnswered);
+}
+
+function checkAnswered(question){
+  var anyAnswered = false;
+  var answers = $('[name='+question.id+']');
+
+  for (var i = 0; i < answers.length; i++) {
+    if (answers[i].checked) {
+      anyAnswered = true;
+    }
+  }
+  return anyAnswered;
+}
+
+  $('#doneButton').on('click', function() {
+  checkAnswers();
+  stop();
+  $("#messageDiv").html("Game Over!");
+  })
+});
