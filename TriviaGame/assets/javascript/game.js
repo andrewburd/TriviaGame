@@ -146,7 +146,7 @@ function checkAnswers (){
     }
   }
 
-  $('.results').html('correct: '+correct+ "<br>" +'incorrect: '+incorrect+ "<br>" +'unanswered: '+unAnswered);
+  $('.results').html('Correct: '+correct+ "<br>" +'Incorrect: '+incorrect+ "<br>" +'Unanswered: '+unAnswered);
 }
 
 function checkAnswered(question){
